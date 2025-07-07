@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vocabulary Flip Cards</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+  }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  .flip-card {
+    background-color: transparent;
+    width: 280px;
+    height: 150px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front,
+  .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    backface-visibility: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .flip-card-front {
+    background: #4a90e2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+  .flip-card-back {
+    background: #fff;
+    color: #333;
+    transform: rotateY(180deg);
+    font-size: 0.95em;
+    overflow-y: auto;
+  }
+  .explanation {
+    margin-top: 8px;
+    font-style: italic;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<h1>Vocabulary Flip Cards</h1>
+<div class="container" id="cards-container"></div>
+
+<script>
+const vocabList = [
+  {eng:"to pitch an idea", expl:"present idea to someone", pl:"przedstawić pomysł"},
+  {eng:"FOMO", expl:"fear of missing out", pl:"strach przed przegapieniem"},
+  {eng:"countless", expl:"very many", pl:"niezliczone"},
+  {eng:"compelling", expl:"convincing & interesting", pl:"przekonujący, fascynujący"},
+  {eng:"to get a buy-in for sth", expl:"get support for something", pl:"uzyskać poparcie dla czegoś"},
+  {eng:"to draw sb in", expl:"attract someone", pl:"przyciągnąć kogoś"},
+  {eng:"a venture capitalist", expl:"investor in risky projects", pl:"inwestor wysokiego ryzyka"},
+  {eng:"social impact", expl:"effect on society", pl:"wpływ społeczny"},
+  {eng:"to attain", expl:"achieve", pl:"osiągnąć"},
+  {eng:"inevitable", expl:"unavoidable", pl:"nieunikniony"},
+  {eng:"tension", expl:"stress/strain", pl:"napięcie"},
+  {eng:"irresistible", expl:"impossible to resist", pl:"nieodparty"},
+  {eng:"to shore up sth", expl:"support or strengthen", pl:"wzmocnić coś"},
+  {eng:"draw up a plan", expl:"prepare/write a plan", pl:"sporządzić plan"},
+  {eng:"drop a plan", expl:"abandon a plan", pl:"porzucić plan"},
+  {eng:"put forward a plan", expl:"propose a plan", pl:"przedłożyć plan"},
+  {eng:"shelve a plan", expl:"postpone a plan", pl:"odłożyć plan"},
+  {eng:"long-term", expl:"lasting a long time", pl:"długoterminowy"},
+  {eng:"short-term", expl:"lasting a short time", pl:"krótkoterminowy"},
+  {eng:"favourable plan", expl:"advantageous plan", pl:"korzystny plan"},
+  {eng:"to forecast", expl:"predict", pl:"prognozować"},
+  {eng:"to be liable to do sth", expl:"likely to do something", pl:"być podatnym na coś"},
+  {eng:"a gimmick", expl:"trick to attract attention", pl:"chwyt marketingowy"},
+  {eng:"employee retention", expl:"keeping staff", pl:"utrzymanie pracowników"},
+  {eng:"to neglect", expl:"fail to care for", pl:"zaniedbać"},
+  {eng:"to instil sth", expl:"teach gradually", pl:"wpajać coś"},
+  {eng:"to fulfill sth", expl:"achieve or complete", pl:"spełnić coś"},
+  {eng:"to take notice", expl:"pay attention", pl:"zwrócić uwagę"},
+  {eng:"to strive", expl:"work hard towards a goal", pl:"dążyć"},
+  {eng:"to fuel sth", expl:"make something grow or intensify", pl:"podsycać coś"},
+  {eng:"PTO", expl:"paid time off", pl:"płatny urlop"},
+  {eng:"stagnant", expl:"not growing or changing", pl:"stagnujący"},
+  {eng:"sibling", expl:"brother or sister", pl:"rodzeństwo"},
+  {eng:"inhospitable", expl:"harsh or unwelcoming", pl:"nieprzyjazny"},
+  {eng:"to expose", expl:"reveal or make vulnerable", pl:"ujawnić/narażać"},
+  {eng:"stamina", expl:"physical strength or energy", pl:"wytrzymałość"},
+  {eng:"endurance", expl:"ability to keep going", pl:"odporność"},
+  {eng:"to duck", expl:"avoid quickly", pl:"uchylić się"},
+  {eng:"to yell", expl:"shout loudly", pl:"krzyczeć"},
+  {eng:"deepfakes", expl:"fake media created with AI", pl:"fałszywe nagrania"},
+  {eng:"to swap", expl:"exchange", pl:"zamienić"},
+  {eng:"convincing", expl:"believable", pl:"przekonujący"},
+  {eng:"to spread", expl:"move widely", pl:"rozprzestrzeniać się"},
+  {eng:"to affect", expl:"have an effect on", pl:"wpływać"},
+  {eng:"inappropriate", expl:"unsuitable", pl:"nieodpowiedni"},
+  {eng:"without consent", expl:"without permission", pl:"bez zgody"},
+  {eng:"the public", expl:"ordinary people", pl:"opinia publiczna"},
+  {eng:"to be tricked", expl:"be deceived", pl:"dać się nabrać"},
+  {eng:"to insult", expl:"offend", pl:"obrazić"},
+  {eng:"to take sth down", expl:"remove something", pl:"usunąć coś"},
+  {eng:"a batch", expl:"group of items", pl:"partia, seria"},
+  {eng:"unreliable", expl:"not trustworthy", pl:"niewiarygodny"},
+  {eng:"to run out of sth", expl:"use up something", pl:"skończyć się"},
+  {eng:"to be fed up with sth", expl:"tired of something", pl:"mieć dosyć czegoś"},
+  {eng:"cracked", expl:"slightly broken", pl:"pęknięty"},
+  {eng:"scratched", expl:"marked with scratches", pl:"porysowany"},
+  {eng:"substandard", expl:"poor quality", pl:"poniżej normy"},
+  {eng:"to sort sth out", expl:"fix or resolve something", pl:"rozwiązać coś"},
+  {eng:"fancy", expl:"elaborate or stylish", pl:"wymyślny, elegancki"},
+  {eng:"doomed to do sth", expl:"destined to fail", pl:"skazany na coś"},
+  {eng:"a flaw", expl:"weakness or defect", pl:"wada"},
+  {eng:"cardiovascular disease", expl:"heart disease", pl:"choroba układu krążenia"},
+  {eng:"diabetes", expl:"high blood sugar condition", pl:"cukrzyca"},
+  {eng:"to fixate on sth", expl:"obsess over something", pl:"zafiksować się"},
+  {eng:"preoccupation with sth", expl:"constant focus on something", pl:"zaabsorbowanie"},
+  {eng:"disturbances", expl:"disruptions or problems", pl:"zakłócenia"},
+  {eng:"merely", expl:"only or just", pl:"tylko, zaledwie"},
+  {eng:"a roadblock to sth", expl:"obstacle to something", pl:"przeszkoda"},
+  {eng:"to fuel sth", expl:"make something stronger or grow", pl:"podsycać coś"},
+  {eng:"findings", expl:"research results", pl:"wyniki badań"},
+  {eng:"simplistic", expl:"too simple", pl:"zbyt uproszczony"},
+  {eng:"a dispute", expl:"argument or disagreement", pl:"spór"},
+  {eng:"to reconcile", expl:"bring into agreement", pl:"pogodzić"},
+  {eng:"inconclusive", expl:"unclear or uncertain", pl:"niejednoznaczny"},
+  {eng:"to account for sth", expl:"explain something", pl:"wyjaśniać"},
+  {eng:"to be the lifeblood of sth", expl:"be essential for something", pl:"być siłą napędową"},
+  {eng:"to be conducive to sth", expl:"help something happen", pl:"sprzyjać czemuś"},
+  {eng:"on the flip side", expl:"on the other hand", pl:"z drugiej strony"},
+  {eng:"to stem from sth", expl:"originate from something", pl:"wynikać z czegoś"},
+  {eng:"to mitigate", expl:"make less severe", pl:"łagodzić"},
+  {eng:"to harness", expl:"make use of something", pl:"wykorzystać"},
+  {eng:"contributors", expl:"people who help or contribute", pl:"współtwórcy"},
+  {eng:"team dynamics", expl:"interactions within a team", pl:"dynamika zespołu"}
+];
+
+const container = document.getElementById('cards-container');
+
+vocabList.forEach(item => {
+  const card = document.createElement('div');
+  card.className = 'flip-card';
+  card.innerHTML = `
+    <div class="flip-card-inner">
+      <div class="flip-card-front">${item.eng}</div>
+      <div class="flip-card-back">
+        <strong>${item.pl}</strong><br />
+        <div class="explanation">${item.expl}</div>
+      </div>
+    </div>
+  `;
+  card.addEventListener('click', () => card.classList.toggle('flipped'));
+  container.appendChild(card);
+});
+</script>
+</body>
+</html>
