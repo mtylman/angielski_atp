@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vocabulary review for 2025/07/10</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .flipcard-container {
+    perspective: 1000px;
+    width: 320px;
+    height: 220px;
+    margin-bottom: 10px;
+  }
+  .flipcard {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flipcard.flipped {
+    transform: rotateY(180deg);
+  }
+  .flipcard-front, .flipcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    backface-visibility: hidden;
+    border-radius: 10px;
+  }
+  .flipcard-front {
+    background: #0099ff;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .flipcard-back {
+    background: white;
+    color: #333;
+    transform: rotateY(180deg);
+    font-size: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .english {
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  .polish {
+    color: #555;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .example {
+    color: #444;
+    font-size: 14px;
+    font-style: normal;
+    margin-top: auto;
+    border-top: 1px solid #ccc;
+    padding-top: 8px;
+  }
+  .buttons {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  button {
+    background-color: #0099ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button:disabled {
+    background-color: #bbb;
+    cursor: not-allowed;
+  }
+  .counter {
+    font-size: 18px;
+    user-select: none;
+  }
+  input[type="number"] {
+    width: 50px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+</style>
+</head>
+<body>
+
+<div class="flipcard-container">
+  <div class="flipcard" id="flipcard" tabindex="0" aria-label="Flip card">
+    <div class="flipcard-front" id="card-front">Word</div>
+    <div class="flipcard-back" id="card-back">
+      <div class="english">English explanation</div>
+      <div class="polish">Polish translation</div>
+      <div class="example"><strong>Example:</strong> Sentence here</div>
+    </div>
+  </div>
+</div>
+
+<div class="buttons">
+  <button id="prevBtn" aria-label="Previous card">Previous</button>
+  <div class="counter" id="counter">1 / 10</div>
+  <button id="nextBtn" aria-label="Next card">Next</button>
+  <label for="jumpInput" style="margin-left: 15px;">Go to:</label>
+  <input type="number" id="jumpInput" min="1" />
+</div>
+
+<script>
+ const cards = [
+  { 
+    word: "to pitch an idea", 
+    explanation: "present idea to someone", 
+    polish: "przedstawić pomysł", 
+    example: "She pitched her idea to the investors and got funding." 
+  },
+  { 
+    word: "FOMO", 
+    explanation: "fear of missing out", 
+    polish: "strach przed przegapieniem", 
+    example: "His FOMO made him attend every event." 
+  },
+  { 
+    word: "countless", 
+    explanation: "too many to count", 
+    polish: "niezliczony", 
+    example: "There are countless stars in the sky." 
+  },
+  { 
+    word: "compelling", 
+    explanation: "very convincing or interesting", 
+    polish: "przekonujący", 
+    example: "She made a compelling argument in the meeting." 
+  },
+  { 
+    word: "to get a buy-in for sth", 
+    explanation: "to gain agreement or support", 
+    polish: "zdobyć akceptację czegoś", 
+    example: "We need to get buy-in from all stakeholders." 
+  },
+  { 
+    word: "to draw sb in", 
+    explanation: "to attract someone's interest or attention", 
+    polish: "przyciągnąć kogoś", 
+    example: "The story drew me in immediately." 
+  },
+  { 
+    word: "a venture capitalist", 
+    explanation: "someone who invests money in startups", 
+    polish: "inwestor venture capital", 
+    example: "The venture capitalist funded several tech startups." 
+  },
+  { 
+    word: "social impact", 
+    explanation: "effect on society", 
+    polish: "wpływ społeczny", 
+    example: "The project has a positive social impact on the community." 
+  },
+  { 
+    word: "to attain", 
+    explanation: "to achieve or reach", 
+    polish: "osiągnąć", 
+    example: "She attained her goals through hard work." 
+  },
+  { 
+    word: "inevitable", 
+    explanation: "certain to happen", 
+    polish: "nieunikniony", 
+    example: "Change is inevitable in any business." 
+  },
+  { 
+    word: "tension", 
+    explanation: "stress or strain", 
+    polish: "napięcie", 
+    example: "There was tension between the two teams during the project." 
+  },
+  { 
+    word: "irresistible", 
+    explanation: "impossible to refuse", 
+    polish: "nieodparty", 
+    example: "The cake looked so good it was irresistible." 
+  },
+  { 
+    word: "to shore up sth", 
+    explanation: "to support or strengthen", 
+    polish: "wspierać, wzmacniać", 
+    example: "They shored up the old building to prevent collapse." 
+  },
+  { 
+    word: "draw up/drop/put forward/shelve a plan", 
+    explanation: "to create, propose or postpone a plan", 
+    polish: "sporządzić/odrzucić/przedstawić/odłożyć plan", 
+    example: "They drew up a plan for the new project." 
+  },
+  { 
+    word: "long-term", 
+    explanation: "lasting for a long period", 
+    polish: "długoterminowy", 
+    example: "We need a long-term strategy for growth." 
+  },
+  { 
+    word: "short-term", 
+    explanation: "lasting for a short period", 
+    polish: "krótkoterminowy", 
+    example: "This is just a short-term solution." 
+  },
+  { 
+    word: "favourable plan", 
+    explanation: "a plan that is advantageous or positive", 
+    polish: "korzystny plan", 
+    example: "They developed a favourable plan to increase sales." 
+  },
+  { 
+    word: "to forecast", 
+    explanation: "to predict future events", 
+    polish: "prognozować", 
+    example: "Experts forecast a rise in temperatures." 
+  },
+  { 
+    word: "to be liable to do sth", 
+    explanation: "likely to do something", 
+    polish: "być podatnym na coś", 
+    example: "Older cars are liable to break down." 
+  },
+  { 
+    word: "a gimmick", 
+    explanation: "a trick or device to attract attention", 
+    polish: "sztuczka", 
+    example: "The sale was just a marketing gimmick." 
+  },
+  { 
+    word: "employee retention", 
+    explanation: "keeping employees in a company", 
+    polish: "utrzymanie pracowników", 
+    example: "Good benefits improve employee retention." 
+  },
+  { 
+    word: "to neglect", 
+    explanation: "to fail to care for properly", 
+    polish: "zaniedbać", 
+    example: "She neglected her responsibilities." 
+  },
+  { 
+    word: "to instil sth", 
+    explanation: "to gradually introduce an idea or feeling", 
+    polish: "wpajać coś", 
+    example: "Parents instil good values in their children." 
+  },
+  { 
+    word: "to fulfill sth", 
+    explanation: "to complete or achieve something", 
+    polish: "spełniać coś", 
+    example: "He fulfilled all the requirements for the job." 
+  },
+  { 
+    word: "to take notice", 
+    explanation: "to pay attention", 
+    polish: "zauważyć", 
+    example: "The manager took notice of her hard work." 
+  },
+  { 
+    word: "to strive", 
+    explanation: "to try hard to achieve something", 
+    polish: "dążyć", 
+    example: "We strive for excellence in our work." 
+  },
+  { 
+    word: "to fuel sth", 
+    explanation: "to cause or increase something", 
+    polish: "pobudzać coś", 
+    example: "The news fueled public anger." 
+  },
+  { 
+    word: "PTO", 
+    explanation: "paid time off from work", 
+    polish: "płatny urlop", 
+    example: "She used her PTO to go on vacation." 
+  },
+  { 
+    word: "stagnant", 
+    explanation: "not moving or growing", 
+    polish: "nieruchomy, stagnujący", 
+    example: "The economy has been stagnant for years." 
+  },
+  { 
+    word: "sibling", 
+    explanation: "brother or sister", 
+    polish: "rodzeństwo", 
+    example: "She has two siblings, a brother and a sister." 
+  },
+  { 
+    word: "inhospitable", 
+    explanation: "unfriendly or harsh environment", 
+    polish: "nieprzyjazny", 
+    example: "The desert is an inhospitable place to live." 
+  },
+  { 
+    word: "to expose", 
+    explanation: "to reveal something hidden", 
+    polish: "ujawnić", 
+    example: "The investigation exposed corruption." 
+  },
+  { 
+    word: "stamina", 
+    explanation: "physical or mental strength to do something for a long time", 
+    polish: "wytrzymałość", 
+    example: "Runners need stamina to finish a marathon." 
+  },
+  { 
+    word: "endurance", 
+    explanation: "ability to endure hardship or stress", 
+    polish: "wytrzymałość", 
+    example: "She showed great endurance during the race." 
+  },
+  { 
+    word: "to duck", 
+    explanation: "to quickly lower the head or body to avoid something", 
+    polish: "unikać, schylać się", 
+    example: "He ducked to avoid the flying ball." 
+  },
+  { 
+    word: "to yell", 
+    explanation: "to shout loudly", 
+    polish: "krzyczeć", 
+    example: "She yelled for help." 
+  },
+  { 
+    word: "deepfakes", 
+    explanation: "fake videos or images made with AI", 
+    polish: "fałszywe materiały video", 
+    example: "Deepfakes can be used to spread misinformation." 
+  },
+  { 
+    word: "to swap", 
+    explanation: "to exchange", 
+    polish: "zamienić się", 
+    example: "They swapped seats during the flight." 
+  },
+  { 
+    word: "convincing", 
+    explanation: "able to persuade", 
+    polish: "przekonujący", 
+    example: "He gave a convincing speech." 
+  },
+  { 
+    word: "to spread", 
+    explanation: "to distribute over a larger area", 
+    polish: "rozprzestrzeniać się", 
+    example: "The fire spread quickly." 
+  },
+  { 
+    word: "to affect", 
+    explanation: "to influence or have an impact", 
+    polish: "wpływać na", 
+    example: "The weather affects my mood." 
+  },
+  { 
+    word: "inappropriate", 
+    explanation: "not suitable or proper", 
+    polish: "nieodpowiedni", 
+    example: "His comments were inappropriate for the meeting." 
+  },
+  { 
+    word: "without consent", 
+    explanation: "without permission", 
+    polish: "bez zgody", 
+    example: "They shared the photo without consent." 
+  },
+  { 
+    word: "the public", 
+    explanation: "people in general", 
+    polish: "społeczeństwo", 
+    example: "The public was informed about the changes." 
+  },
+  { 
+    word: "to be tricked", 
+    explanation: "to be deceived or fooled", 
+    polish: "zostać oszukanym", 
+    example: "He was tricked by a scammer." 
+  },
+  { 
+    word: "to insult", 
+    explanation: "to say or do something offensive", 
+    polish: "obrażać", 
+    example: "She insulted him during the argument." 
+  },
+  { 
+    word: "to take sth down", 
+    explanation: "to remove something", 
+    polish: "zdjąć coś", 
+    example: "They took down the old posters." 
+  },
+  { 
+    word: "a batch", 
+    explanation: "a group or set", 
+    polish: "partia", 
+    example: "A batch of cookies just came out of the oven." 
+  },
+  { 
+    word: "unreliable", 
+    explanation: "not dependable", 
+    polish: "niewiarygodny", 
+    example: "The weather forecast was unreliable." 
+  },
+  { 
+    word: "to run out of sth", 
+    explanation: "to have none left", 
+    polish: "skończyć się", 
+    example: "We ran out of milk." 
+  },
+  { 
+    word: "to be fed up with sth", 
+    explanation: "to be annoyed or tired of something", 
+    polish: "mieć czegoś dość", 
+    example: "I’m fed up with this noise." 
+  },
+  { 
+    word: "cracked", 
+    explanation: "broken with lines but not completely apart", 
+    polish: "popękany", 
+    example: "The glass was cracked but still intact." 
+  },
+  { 
+    word: "scratched", 
+    explanation: "marked with small cuts or lines", 
+    polish: "porysowany", 
+    example: "The CD was scratched and wouldn’t play." 
+  },
+  { 
+    word: "substandard", 
+    explanation: "below the usual standard", 
+    polish: "poniżej standardu", 
+    example: "The service was substandard." 
+  },
+  { 
+    word: "to sort sth out", 
+    explanation: "to resolve a problem", 
+    polish: "rozwiązać coś", 
+    example: "We need to sort out the issues quickly." 
+  },
+  { 
+    word: "fancy", 
+    explanation: "elaborate or expensive", 
+    polish: "wyszukany", 
+    example: "They live in a fancy apartment." 
+  },
+  { 
+    word: "doomed to do sth", 
+    explanation: "certain to fail or have bad results", 
+    polish: "skazany na coś", 
+    example: "The plan was doomed to fail from the start." 
+  },
+  { 
+    word: "a flaw", 
+    explanation: "a mistake or weakness", 
+    polish: "wada", 
+    example: "There is a flaw in the design." 
+  },
+  { 
+    word: "cardiovascular disease", 
+    explanation: "diseases of the heart and blood vessels", 
+    polish: "choroba sercowo-naczyniowa", 
+    example: "Smoking increases the risk of cardiovascular disease." 
+  },
+  { 
+    word: "diabetes", 
+    explanation: "a disease affecting blood sugar levels", 
+    polish: "cukrzyca", 
+    example: "Diabetes requires careful management of diet." 
+  },
+  { 
+    word: "to fixate on sth", 
+    explanation: "to obsess about something", 
+    polish: "skupiać się obsesyjnie na czymś", 
+    example: "He fixated on his mistakes all day." 
+  },
+  { 
+    word: "preoccupation with sth", 
+    explanation: "constant attention to something", 
+    polish: "zajęcie się czymś", 
+    example: "Her preoccupation with work affected her health." 
+  },
+  { 
+    word: "disturbances", 
+    explanation: "interruptions or problems", 
+    polish: "zakłócenia", 
+    example: "There were disturbances during the concert." 
+  },
+  { 
+    word: "merely", 
+    explanation: "only or simply", 
+    polish: "zaledwie", 
+    example: "It was merely a suggestion, not a rule." 
+  },
+  { 
+    word: "a roadblock to sth", 
+    explanation: "an obstacle or barrier", 
+    polish: "przeszkoda w czymś", 
+    example: "Lack of funding was a roadblock to progress." 
+  },
+  { 
+    word: "to fuel sth", 
+    explanation: "to cause or increase something", 
+    polish: "pobudzać coś", 
+    example: "Social media fuels misinformation." 
+  },
+  { 
+    word: "findings", 
+    explanation: "results or conclusions from research", 
+    polish: "wyniki badań", 
+    example: "The findings were published in a report." 
+  },
+  { 
+    word: "simplistic", 
+    explanation: "too simple and not accurate enough", 
+    polish: "zbyt uproszczony", 
+    example: "His explanation was simplistic." 
+  },
+  { 
+    word: "a dispute", 
+    explanation: "a disagreement or argument", 
+    polish: "spór", 
+    example: "The dispute was settled out of court." 
+  },
+  { 
+    word: "to reconcile", 
+    explanation: "to restore friendly relations", 
+    polish: "pogodzić się", 
+    example: "They reconciled after the argument." 
+  },
+  { 
+    word: "inconclusive", 
+    explanation: "not leading to a firm conclusion", 
+    polish: "niejednoznaczny", 
+    example: "The test results were inconclusive." 
+  },
+  { 
+    word: "to account for sth", 
+    explanation: "to explain or justify", 
+    polish: "tłumaczyć coś", 
+    example: "The report accounts for the recent changes." 
+  },
+  { 
+    word: "to be the lifeblood of sth", 
+    explanation: "to be the most important part", 
+    polish: "być podstawą czegoś", 
+    example: "Innovation is the lifeblood of this company." 
+  },
+  { 
+    word: "to be conducive to sth", 
+    explanation: "to make a situation likely or possible", 
+    polish: "sprzyjać czemuś", 
+    example: "A quiet room is conducive to studying." 
+  },
+  { 
+    word: "on the flip side", 
+    explanation: "on the other hand", 
+    polish: "z drugiej strony", 
+    example: "On the flip side, the job offers great experience." 
+  },
+  { 
+    word: "to stem from sth", 
+    explanation: "to come from or be caused by something", 
+    polish: "wynikać z czegoś", 
+    example: "Many problems stem from poor communication." 
+  },
+  { 
+    word: "to mitigate", 
+    explanation: "to reduce the severity", 
+    polish: "łagodzić", 
+    example: "They took steps to mitigate the risks." 
+  },
+  { 
+    word: "to harness", 
+    explanation: "to control and use something", 
+    polish: "ujarzmić", 
+    example: "We need to harness solar energy better." 
+  },
+  { 
+    word: "contributors", 
+    explanation: "people who give or add something", 
+    polish: "współtwórcy", 
+    example: "The contributors helped write the book." 
+  },
+  { 
+    word: "team dynamics", 
+    explanation: "the way a team works together", 
+    polish: "dynamika zespołu", 
+    example: "Good team dynamics improve productivity." 
+  }
+];
+
+  let currentIndex = 0;
+  const flipcard = document.getElementById('flipcard');
+  const front = document.getElementById('card-front');
+  const back = document.getElementById('card-back');
+  const englishDiv = back.querySelector('.english');
+  const polishDiv = back.querySelector('.polish');
+  const exampleDiv = back.querySelector('.example');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  const jumpInput = document.getElementById('jumpInput');
+
+  function updateCard() {
+    front.textContent = cards[currentIndex].word;
+    englishDiv.textContent = cards[currentIndex].explanation;
+    polishDiv.textContent = cards[currentIndex].polish;
+    exampleDiv.innerHTML = "<strong>Example:</strong> " + cards[currentIndex].example;
+    flipcard.classList.remove('flipped');
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === cards.length -1;
+    counter.textContent = `${currentIndex + 1} / ${cards.length}`;
+    jumpInput.value = currentIndex + 1;
+  }
+
+  flipcard.addEventListener('click', () => {
+    flipcard.classList.toggle('flipped');
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if(currentIndex > 0){
+      currentIndex--;
+      updateCard();
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(currentIndex < cards.length -1){
+      currentIndex++;
+      updateCard();
+    }
+  });
+
+  jumpInput.addEventListener('change', () => {
+    let val = Number(jumpInput.value);
+    if(val >= 1 && val <= cards.length){
+      currentIndex = val - 1;
+      updateCard();
+    } else {
+      jumpInput.value = currentIndex + 1; // reset to valid number
+    }
+  });
+
+  // Initialize first card
+  updateCard();
+</script>
+
+</body>
+</html>
